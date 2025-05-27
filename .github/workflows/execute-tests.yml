@@ -10,23 +10,23 @@ on:
   workflow_dispatch: # Permite ejecutar el workflow manualmente desde la interfaz de GitHub
 
 jobs: # se pueden definir n cantidad de jobs
-  test: # El nombre no importa
-    runs-on: ubuntu-latest # El runner o ambiente en el que se va a ejecutar
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # test: # El nombre no importa
+  #   runs-on: ubuntu-latest # El runner o ambiente en el que se va a ejecutar
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Set up Node.js v20 # El nombre es un string
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
+  #     - name: Set up Node.js v20 # El nombre es un string
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #         cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci # Este comando no es necesario que exista en el package.json, es uso exclusivo de CI
+  #     - name: Install dependencies
+  #       run: npm ci # Este comando no es necesario que exista en el package.json, es uso exclusivo de CI
 
-      - name: Run unit tests
-        run: npm run test # Este comando debe existir en el package.json
+  #     - name: Run unit tests
+  #       run: npm run test # Este comando debe existir en el package.json
 
   lint:
     # needs: [test] Se ejecuta una despues de la otra con este comando
@@ -46,3 +46,30 @@ jobs: # se pueden definir n cantidad de jobs
 
       - name: Run lint
         run: npm run lint # Este comando debe existir en el package.json
+
+  test:
+    name: Run Tests
+    needs: [lint]
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [18, 20]
+        exclude:
+          - os: macos-latest
+            node-version: 18
+    runs-on: ${{ matrix.os}}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version}}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
