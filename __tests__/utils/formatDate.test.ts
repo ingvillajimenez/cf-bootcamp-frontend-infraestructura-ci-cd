@@ -5,7 +5,6 @@ describe('formatDate', () => {
   it('returns "1 day ago" for a date from yesterday', () => {
     const yesterday = new Date();
     yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-    console.log(`Testing with date: ${yesterday.toISOString()}`);
     expect(formatDate(yesterday.toISOString())).toBe('1 day ago');
   });
 
