@@ -4,6 +4,10 @@ name: Ejecutando Tests # El nombre no importa, es un string
 on:
   push:
     branches: ['develop'] # Es el nombre de las ramas
+  # Ejecute cada cierta cantidad de tiempo
+  # schedule:
+  # - cron: '0 0 * * *' # Cada día a la medianoche UTC
+  workflow_dispatch: # Permite ejecutar el workflow manualmente desde la interfaz de GitHub
 
 jobs: # se pueden definir n cantidad de jobs
   test: # El nombre no importa
@@ -25,6 +29,7 @@ jobs: # se pueden definir n cantidad de jobs
         run: npm run test # Este comando debe existir en el package.json
 
   lint:
+    needs: [test]
     runs-on: windows-latest
     steps:
       - name: Checkout code
